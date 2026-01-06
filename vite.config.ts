@@ -6,8 +6,6 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import pages from 'vite-plugin-pages'
 
-// Adjust path
-// import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   base: '/', // Keep this as '/' for absolute paths
@@ -47,32 +45,6 @@ export default defineConfig({
     elysiaConnect(App, {
       prefix: '/api',
     }),
-    // VitePWA({
-    //   registerType: 'autoUpdate',
-    //   manifest: {
-    //     name: 'Inflector Base',
-    //     short_name: 'Inflector',
-    //     description: 'Base Template for Inflector Products',
-    //     theme_color: '#121212',
-    //     background_color: '#121212',
-
-    //     icons: [
-    //       {
-    //         src: 'logo192.png',
-    //         sizes: '192x192',
-    //         type: 'image/png',
-    //       },
-    //       {
-    //         src: 'logo512.png',
-    //         sizes: '512x512',
-    //         type: 'image/png',
-    //       },
-    //     ],
-    //   },
-    //   devOptions: {
-    //     enabled: true,
-    //   },
-    // }),
   ],
   server: {
     port: 3000,
