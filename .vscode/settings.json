@@ -1,0 +1,22 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "prettier.configPath": "./prettier.config.cjs",
+  "files.exclude": {
+    ".git": true,
+    ".gitignore": true,
+    ".prettier**": true,
+    ".vscode": true,
+    "**/**.d.ts": true,
+    "components.json": true,
+    "dev-dist": true,
+    "dist": true,
+    "eslint.config.js": true,
+    "index.html": true,
+    "node_modules": true,
+    "prettier.**": true,
+    "prod.ts": true,
+    "src/main.tsx": true,
+    "tsconfig.**": true
+  }
+}
