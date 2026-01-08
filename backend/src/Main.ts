@@ -1,18 +1,19 @@
 import {cosineSimilarity} from 'ai'
 import { ChunkAndEmbed } from "./Chunk";
+import { preprocessText } from "./Process";
 import { Embed } from "./Embed";
 import { PDFtoTXT } from "./Process";
 import path from "path";
 
 console.time("Main")
 const file = Bun.file(path.join(process.cwd(), "Data", "Files", "FSB.pdf"));
-const TextContent = await PDFtoTXT(file)
+let TextContent = await PDFtoTXT(file)
 
-const CleenData = ""
+TextContent = await preprocessText(TextContent)
 
 const EmbededData = await ChunkAndEmbed(TextContent)
-const Q = "Directeur, Département d’Informatique"
-const InputObj = {
+const Q = "Directeur"
+const InputObj = { 
     text:Q,
     embedding:await Embed(Q)
 }
