@@ -264,3 +264,8 @@ html {
 .h-st {
   height: stretch;
 }
+
+
+body{
+  overflow: hidden;
+}
