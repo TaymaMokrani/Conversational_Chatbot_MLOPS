@@ -49,14 +49,11 @@ async function initializeRetriever() {
     }
 }
 
-// Start initialization immediately (async)
-// We await it here if we want to block startup, or let it run in background.
-// Blocking is safer to ensure it works on first request.
 await initializeRetriever();
 
 
 const RagTool = tool({
-    description: "Search for specific information about universities, faculties (like FSB), and career paths within the official documents.",
+    description: "Search for specific information about universities, faculties , and career paths within the official documents.",
     inputSchema: z.object({
         query: z.string().describe("The specific search term or question to look up"),
     }),
@@ -97,7 +94,7 @@ App.post("/api/chat", async ({ body, set }) => {
     // AI here 
     const AiResponce = streamText({
         model: createOpenRouter({ apiKey: APIKEY })("google/gemini-2.5-flash"),
-        system: "The user is looking to get advice on career study path. Guide him. You have access to a RAG tool that searches the official 'FSB' (Faculty of Science Bizerte) documents. ALWAYS use the RAG tool if the user asks about courses, curriculums, directors, or specific faculty details. Answer in French if the user asks in French.",
+        system: "The user is looking to get advice on career study path. Guide him. You have access to a RAG tool that searches the official universities documents. ALWAYS use the RAG tool if the user asks about courses, curriculums, directors, or specific faculty details. Answer in French if the user asks in French.",
         messages: await convertToModelMessages(messages),
 
         stopWhen: stepCountIs(5),
