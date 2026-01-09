@@ -13,7 +13,8 @@ export async function splitIntoSentences(
 
 export async function ChunkAndEmbed(
   markdown: string,
-  config?: { chunkSize?: number; overlapSize?: number }
+  config?: { chunkSize?: number; overlapSize?: number },
+  source?: string
 ) {
   const Sentences = await splitIntoSentences(markdown, config);
   // console.log(Sentences)
@@ -22,6 +23,7 @@ export async function ChunkAndEmbed(
       id: crypto.randomUUID(),
       text: sentence,
       embedding: await Embed(sentence),
+      metadata: source ? { source } : undefined,
     }))
   );
   return embeddings;

@@ -3,6 +3,7 @@ import { pipeline } from "@xenova/transformers";
 const Embedder = await pipeline(
     "feature-extraction",
     "Xenova/all-MiniLM-L6-v2"
+    
   );
 
   export const Embed = async (value: string) => {
