@@ -1,30 +1,28 @@
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { Embed } from "./Embed";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters"
+import { Embed } from "./Embed"
+import { loadParams } from "./params_config_versions/load_params"
 
-export async function splitIntoSentences(
-  markdown: string,
-  config?: { chunkSize?: number; overlapSize?: number }
-): Promise<string[]> {
+const PARAMS = loadParams("v1")
+
+export async function splitIntoSentences(markdown: string): Promise<string[]> {
   return await RecursiveCharacterTextSplitter.fromLanguage("markdown", {
-    chunkSize: config?.chunkSize || 1000,
-    chunkOverlap: config?.overlapSize || 200,
-  }).splitText(markdown);
+    chunkSize: PARAMS.chunking.chunkSize,
+    chunkOverlap: PARAMS.chunking.overlapSize,
+  }).splitText(markdown)
 }
 
 export async function ChunkAndEmbed(
   markdown: string,
-  config?: { chunkSize?: number; overlapSize?: number },
   source?: string
 ) {
-  const Sentences = await splitIntoSentences(markdown, config);
-  // console.log(Sentences)
-  const embeddings = await Promise.all(
-    Sentences.map(async (sentence) => ({
+  const sentences = await splitIntoSentences(markdown)
+
+  return await Promise.all(
+    sentences.map(async (sentence) => ({
       id: crypto.randomUUID(),
       text: sentence,
       embedding: await Embed(sentence),
       metadata: source ? { source } : undefined,
     }))
-  );
-  return embeddings;
+  )
 }

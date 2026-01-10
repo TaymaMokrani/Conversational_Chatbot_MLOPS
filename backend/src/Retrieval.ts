@@ -1,5 +1,7 @@
 import { cosineSimilarity } from "ai";
 import { removeStopwords } from "stopword";
+import { loadParams } from "./params_config_versions/load_params"
+const PARAMS = loadParams("v1")
 
 export type DocumentChunk = {
     id: string;
@@ -57,8 +59,9 @@ export class BM25Retriever {
     private idf: Map<string, number> = new Map();
 
     // Tuning parameters
-    private k1: number = 1.5;
-    private b: number = 0.75;
+    private k1: number = PARAMS.retrieval.bm25.k1
+    private b: number = PARAMS.retrieval.bm25.b
+
 
     constructor(docs: DocumentChunk[]) {
         this.documents = docs;
@@ -145,36 +148,47 @@ export class HybridRetriever {
         this.bm25 = new BM25Retriever(chunks);
     }
 
-    async search(queryText: string, queryEmbedding: number[], k: number = 5, weights: { vector?: number; bm25?: number } = { vector: 0.5, bm25: 0.5 }) {
-        // 1. Get results from both
-        const vectorResults = await this.vectorStore.search(queryEmbedding, k * 2); // Get more candidates
-        const bm25Results = this.bm25.search(queryText, k * 2);
+    async search(
+  queryText: string,
+  queryEmbedding: number[]
+): Promise<ScoredChunk[]> {
 
-        // 2. Combine (Using RRF: 1 / (k + rank))
-        const rrfK = 60;
-        const scores = new Map<string, number>();
-        const docMap = new Map<string, DocumentChunk>();
+  const topK = PARAMS.retrieval.topK
+  const rrfK = PARAMS.retrieval.hybrid.rrfK
 
-        // Helper to add scores
-        const addScores = (results: ScoredChunk[]) => {
-            results.forEach((res, rank) => {
-                const current = scores.get(res.id) || 0;
-                scores.set(res.id, current + (1 / (rrfK + rank + 1)));
-                docMap.set(res.id, res);
-            });
-        };
+  // 1. Retrieve candidates
+  const vectorResults = await this.vectorStore.search(
+    queryEmbedding,
+    topK * 2
+  )
 
-        addScores(vectorResults);
-        addScores(bm25Results);
+  const bm25Results = this.bm25.search(
+    queryText,
+    topK * 2
+  )
 
-        // 3. Sort and constrain
-        const fused = Array.from(scores.entries()).map(([id, score]) => ({
-            ...docMap.get(id)!,
-            score
-        }));
+  // 2. Reciprocal Rank Fusion (RRF)
+  const scores = new Map<string, number>()
+  const docMap = new Map<string, DocumentChunk>()
 
-        return fused
-            .sort((a, b) => b.score - a.score)
-            .slice(0, k);
-    }
+  const addScores = (results: ScoredChunk[]) => {
+    results.forEach((res, rank) => {
+      const prevScore = scores.get(res.id) ?? 0
+      scores.set(res.id, prevScore + 1 / (rrfK + rank + 1))
+      docMap.set(res.id, res)
+    })
+  }
+
+  addScores(vectorResults)
+  addScores(bm25Results)
+
+  // 3. Sort & return topK
+  return Array.from(scores.entries())
+    .map(([id, score]) => ({
+      ...docMap.get(id)!,
+      score
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topK)
+}
 }

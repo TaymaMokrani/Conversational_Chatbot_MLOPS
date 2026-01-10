@@ -1,0 +1,29 @@
+{
+  "chunking": {
+    "chunkSize": 1000,
+    "overlapSize": 200
+  },
+
+  "embedding": {
+    "modelName": "Xenova/all-MiniLM-L6-v2",
+    "pooling": "mean",
+    "normalize": true
+  },
+
+  "processing": {
+    "removeUrls": true,
+    "normalizeWhitespace": true,
+    "preserveNewlines": true
+  },
+
+  "retrieval": {
+    "topK": 5,
+    "bm25": {
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "hybrid": {
+      "rrfK": 60
+    }
+  }
+}

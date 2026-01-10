@@ -1,13 +1,18 @@
-import { pipeline } from "@xenova/transformers";
+import { pipeline } from "@xenova/transformers"
+import { loadParams } from "./params_config_versions/load_params"
+
+const PARAMS = loadParams("v1")
 
 const Embedder = await pipeline(
-    "feature-extraction",
-    "Xenova/all-MiniLM-L6-v2"
-    
-  );
+  "feature-extraction",
+  PARAMS.embedding.modelName
+)
 
-  export const Embed = async (value: string) => {
-    const output = await Embedder(value, { pooling: "mean", normalize: true });
-    return Array.from(output.data as Float32Array);
-  };
-  
+export const Embed = async (value: string) => {
+  const output = await Embedder(value, {
+    pooling: PARAMS.embedding.pooling,
+    normalize: PARAMS.embedding.normalize
+  })
+
+  return Array.from(output.data as Float32Array)
+}

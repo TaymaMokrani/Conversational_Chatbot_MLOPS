@@ -1,4 +1,6 @@
+//@ts-ignore
 import fs from "fs"
+//@ts-ignore
 import path from "path"
 
 export interface AppConfig {
@@ -15,6 +17,7 @@ export interface AppConfig {
 
 export function loadConfig(version = "v1"): AppConfig {
   const configPath = path.join(
+    //@ts-ignore
     process.cwd(),
     "model_config_versions",
     `${version}_config.json`
