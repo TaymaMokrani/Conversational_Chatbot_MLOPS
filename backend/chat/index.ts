@@ -16,7 +16,7 @@ import { Embed } from "../src/Embed"
 import { HybridRetriever } from "../src/Retrieval"
 
 const App = new Elysia()
-const APIKEY = "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"
+const APIKEY = ""
 
 // --- Global Retriever Initialization ---
 let retriever: HybridRetriever | null = null;
