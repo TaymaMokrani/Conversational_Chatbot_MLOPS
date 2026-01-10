@@ -19,6 +19,7 @@ export function loadConfig(version = "v1"): AppConfig {
   const configPath = path.join(
     //@ts-ignore
     process.cwd(),
+    "backend","chat",
     "model_config_versions",
     `${version}_config.json`
   )

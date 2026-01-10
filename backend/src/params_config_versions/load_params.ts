@@ -34,6 +34,7 @@ export function loadParams(version = "v1"): ParamsConfig {
   const paramsPath = path.join(
     //@ts-ignore
     process.cwd(),
+    "backend",
     "src",
     "params_config_versions",
     `${version}_params.json`

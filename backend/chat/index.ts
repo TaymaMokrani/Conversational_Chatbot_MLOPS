@@ -1,4 +1,4 @@
-import { convertToModelMessages, generateText, ModelMessage, stepCountIs, streamText, tool, UIMessage } from 'ai'
+import { convertToModelMessages, stepCountIs, streamText, tool} from 'ai'
 import { Elysia } from 'elysia'
 import { createOpenRouter } from "@openrouter/ai-sdk-provider"
 import z from "zod"
@@ -161,7 +161,7 @@ async function initializeRetriever() {
 
                 // Chunk and embed this file with source metadata
                 const chunkStart = performance.now();
-                const fileChunks = await ChunkAndEmbed(text, undefined, pdfFile);
+                const fileChunks = await ChunkAndEmbed(text,  pdfFile);
                 allChunks.push(...fileChunks);
 
                 const chunkEnd = performance.now();
@@ -220,7 +220,6 @@ const RagTool = tool({
             const results = await retriever.search(
                 query,
                 queryEmbedding,
-                CONFIG.rag.topK
                 )
 
             if (results.length === 0) {
@@ -242,7 +241,7 @@ const RagTool = tool({
 })
 
 
-App.post("/api/chat", async ({ body, set }) => {
+App.post("/api/chat", async ({ body }) => {
     //@ts-ignore
     const { messages }: { messages: UIMessage[] } = body;
 
