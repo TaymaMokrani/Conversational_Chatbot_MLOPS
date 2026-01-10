@@ -5,6 +5,10 @@ import z from "zod"
 import path from "path"
 import fs from "fs"
 
+import { loadConfig } from "./load_config"
+const CONFIG = loadConfig("v1")
+
+
 // Import RAG Backend Logic
 import { PDFtoTXT, preprocessText } from "../src/Process"
 import { ChunkAndEmbed } from "../src/Chunk"
@@ -12,7 +16,7 @@ import { Embed } from "../src/Embed"
 import { HybridRetriever } from "../src/Retrieval"
 
 const App = new Elysia()
-const APIKEY = ""
+const APIKEY = "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"
 
 // --- Global Retriever Initialization ---
 let retriever: HybridRetriever | null = null;
@@ -212,8 +216,12 @@ const RagTool = tool({
             // Generate embedding for query
             const queryEmbedding = await Embed(query);
 
-            // Search (Top 5)
-            const results = await retriever.search(query, queryEmbedding, 5);
+            // Search (Top k)
+            const results = await retriever.search(
+                query,
+                queryEmbedding,
+                CONFIG.rag.topK
+                )
 
             if (results.length === 0) {
                 return "No relevant information found in the documents.";
@@ -240,11 +248,11 @@ App.post("/api/chat", async ({ body, set }) => {
 
     // AI here 
     const AiResponce = streamText({
-        model: createOpenRouter({ apiKey: APIKEY })("google/gemini-2.5-flash"),
-        system: "You are a helpful assistant with access to a comprehensive document knowledge base. You have access to a RAG tool that searches through the loaded documents. ALWAYS use the RAG tool when the user asks about specific details, facts, or information that might be in the documents. Provide accurate, helpful answers based on the retrieved content. If the information is not found in the documents, let the user know. Answer in the same language the user uses.",
+        model: createOpenRouter({ apiKey: APIKEY })(CONFIG.model.name),
+        system: CONFIG.systemPrompt,
         messages: await convertToModelMessages(messages),
 
-        stopWhen: stepCountIs(5),
+        stopWhen: stepCountIs(CONFIG.model.maxSteps),
         tools: {
             RAG: RagTool
         }
